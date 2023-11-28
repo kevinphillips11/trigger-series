@@ -2,6 +2,7 @@ import requests
 import json
 import os
 import time
+import threading
 
 # cancel the previous run
 print('canceling previous run')
@@ -55,8 +56,19 @@ def index():
 
     return render_template('index.html', articles=articles)
 
-app.run(debug=True)
 
+def run_flask():
+    app.run(debug=True, threaded=True)
+
+# Start the Flask app in a separate thread
+flask_thread = threading.Thread(target=run_flask)
+flask_thread.start()
+
+# Run the Flask app for 5 minutes
+time.sleep(300)
+
+# Stop the Flask app by ending the thread (this is not ideal in a production environment)
+flask_thread.join()
 
 
 
@@ -90,3 +102,7 @@ print(response.text)
 print('waiting to be canceled by next run')
 
 time.sleep(60)
+
+
+
+
