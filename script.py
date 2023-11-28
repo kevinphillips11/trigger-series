@@ -57,18 +57,24 @@ def index():
     return render_template('index.html', articles=articles)
 
 
-def run_flask():
-    app.run(debug=True, threaded=True)
+def run_flask_app():
+    app.run(port=5000)
 
-# Start the Flask app in a separate thread
-flask_thread = threading.Thread(target=run_flask)
+
+# Start Flask app in a separate thread
+flask_thread = threading.Thread(target=run_flask_app)
 flask_thread.start()
 
-# Run the Flask app for 5 minutes
+# Wait for 5 minutes
 time.sleep(300)
 
-# Stop the Flask app by ending the thread (this is not ideal in a production environment)
-flask_thread.join()
+# Print "hello" after 5 minutes
+print("hello")
+
+# Stop the Flask app (you may need to adjust this based on your specific use case)
+func = request.environ.get('werkzeug.server.shutdown')
+if func is not None:
+    func()
 
 
 
@@ -102,7 +108,3 @@ print(response.text)
 print('waiting to be canceled by next run')
 
 time.sleep(60)
-
-
-
-
