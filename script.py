@@ -2,23 +2,30 @@ import requests
 import json
 import os
 
+os.environ['PREVIOUS_RUN_ID']='0'
+os.environ['CURRENT_RUN_ID']='123456'
+
 # cancel the previous run
 print('canceling previous run')
-try:
-    url = f"https://api.github.com/repos/kevinphillips11/trigger-series/actions/runs/{os.environ['PREVIOUS_RUN_ID']}/cancel"
 
-    payload = {}
-    headers = {
-    'Accept': 'application/vnd.github+json',
-    'Authorization': 'Bearer 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',
-    'X-GitHub-Api-Version': '2022-11-28'
-    }
+url = f"https://api.github.com/repos/kevinphillips11/trigger-series/actions/runs/{os.environ['PREVIOUS_RUN_ID']}/cancel"
 
-    response = requests.request("POST", url, headers=headers, data=payload)
+payload = json.dumps({
+  "ref": "main",
+  "inputs": {
+    "manual_trigger": "true"
+  }
+})
+headers = {
+'Accept': 'application/vnd.github+json',
+'Authorization': f'Bearer {os.environ["GITHUB_TOKEN"]}',
+'X-GitHub-Api-Version': '2022-11-28'
+}
 
-    print(response.text)
-except:
-    pass
+response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)
+
 
 # middle part - print hello
 
@@ -38,7 +45,7 @@ payload = json.dumps({
 })
 headers = {
 'Accept': 'application/vnd.github+json',
-'Authorization': 'Bearer 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',
+'Authorization': f'Bearer {os.environ["GITHUB_TOKEN"]}',
 'X-GitHub-Api-Version': '2022-11-28',
 'Content-Type': 'application/json'
 }
@@ -48,6 +55,6 @@ response = requests.request("POST", url, headers=headers, data=payload)
 print(response.text)
 
 # wait to be canceled by the next run
-
+print('waiting to be canceled by next run')
 while True:
     pass
