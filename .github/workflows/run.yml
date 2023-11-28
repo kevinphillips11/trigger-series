@@ -29,9 +29,6 @@ jobs:
     - name: Authenticate ngrok
       run: ngrok config add-authtoken $NGROK_TOKEN
 
-    - name: Start ngrok
-      run: ngrok http --domain=handy-labrador-humane.ngrok-free.app 5000 &
-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
@@ -41,8 +38,10 @@ jobs:
       run: |
         pip install -r requirements.txt  # If you have any dependencies
 
-    - name: Run script.py
-      run: python script.py
+    - name: Start ngrok and run script.py
+      run: |
+        ngrok http --domain=handy-labrador-humane.ngrok-free.app 5000 &  # Run Ngrok in the background
+        python script.py
       env:
         CURRENT_RUN_ID: ${{ github.run_id }}
         PREVIOUS_RUN_ID: ${{ github.event.inputs.previous_run_id }}
