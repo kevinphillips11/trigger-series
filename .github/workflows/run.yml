@@ -11,15 +11,25 @@ jobs:
   run_script:
     runs-on: ubuntu-latest
 
-    services:
-      ngrok:
-        image: ghcr.io/kubesail/unprivileged-ngrok:latest
-        ports:
-          - 5000:5000  # Expose port 5000
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Install ngrok
+      run: |
+        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | \
+          sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && \
+          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | \
+          sudo tee /etc/apt/sources.list.d/ngrok.list && \
+          sudo apt update && sudo apt install ngrok
+      env:
+        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+
+    - name: Authenticate ngrok
+      run: ngrok config add-authtoken $NGROK_TOKEN
+
+    - name: Start ngrok
+      run: ngrok http --domain=handy-labrador-humane.ngrok-free.app 5000 &
 
     - name: Set up Python
       uses: actions/setup-python@v2
@@ -30,22 +40,10 @@ jobs:
       run: |
         pip install -r requirements.txt  # If you have any dependencies
 
-    - name: Install ngrok
-      run: |
-        sudo apt update && sudo apt install ngrok
-
-    - name: Authenticate ngrok
-      run: ngrok authtoken ${{ secrets.NGROK_TOKEN }}
-
-    - name: Start ngrok
-      run: ngrok http 5000 &
-      env:
-        NGROK_PORT: 5000
-
     - name: Run script.py
       run: python script.py
       env:
         CURRENT_RUN_ID: ${{ github.run_id }}
         PREVIOUS_RUN_ID: ${{ github.event.inputs.previous_run_id }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        NGROK_PORT: 5000
+        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
