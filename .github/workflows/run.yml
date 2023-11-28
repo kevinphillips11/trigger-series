@@ -11,6 +11,13 @@ jobs:
   run_script:
     runs-on: ubuntu-latest
 
+    services:
+      app:
+        image: python:3.x
+        ports:
+          - 5000:5000
+        command: bash -c "pip install -r requirements.txt && ngrok http --region=us --hostname=handy-labrador-humane.ngrok-free.app 5000 &"
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -34,9 +41,6 @@ jobs:
 
     - name: Authenticate ngrok
       run: ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
-
-    - name: Start ngrok
-      run: ngrok http --domain=handy-labrador-humane.ngrok-free.app 5000 &
 
     - name: Run script.py
       run: python script.py
