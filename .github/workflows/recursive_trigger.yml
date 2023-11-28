@@ -40,14 +40,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Trigger next workflow
-      uses: actions/github-script@v5
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          const response = await octokit.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            workflow_id: 'recursive_trigger',
-          });
-          console.log(response.data);
+        node-version: 14
+
+    - name: Install @actions/github-script
+      run: npm install -g @actions/github-script
+
+    - name: Trigger next workflow
+      run: |
+        github-script.js
+        const { context, github } = require('@actions/github');
+        const response = await github.request('POST /repos/{owner}/{repo}/actions/workflows/{workflow_id}/dispatches', {
+          owner: context.repo.owner,
+          repo: context.repo.repo,
+          workflow_id: 'recursive_trigger',
+        });
+        console.log(response.data);
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
