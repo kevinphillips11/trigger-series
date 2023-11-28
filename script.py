@@ -2,30 +2,29 @@ import requests
 import json
 import os
 
-os.environ['PREVIOUS_RUN_ID']='0'
-os.environ['CURRENT_RUN_ID']='123456'
-
 # cancel the previous run
 print('canceling previous run')
 
-url = f"https://api.github.com/repos/kevinphillips11/trigger-series/actions/runs/{os.environ['PREVIOUS_RUN_ID']}/cancel"
+try:
+    url = f"https://api.github.com/repos/kevinphillips11/trigger-series/actions/runs/{os.environ['PREVIOUS_RUN_ID']}/cancel"
 
-payload = json.dumps({
-  "ref": "main",
-  "inputs": {
-    "manual_trigger": "true"
-  }
-})
-headers = {
-'Accept': 'application/vnd.github+json',
-'Authorization': f'Bearer {os.environ["GITHUB_TOKEN"]}',
-'X-GitHub-Api-Version': '2022-11-28'
-}
+    payload = json.dumps({
+    "ref": "main",
+    "inputs": {
+        "manual_trigger": "true"
+    }
+    })
+    headers = {
+    'Accept': 'application/vnd.github+json',
+    'Authorization': f'Bearer {os.environ["GITHUB_TOKEN"]}',
+    'X-GitHub-Api-Version': '2022-11-28'
+    }
 
-response = requests.request("POST", url, headers=headers, data=payload)
+    response = requests.request("POST", url, headers=headers, data=payload)
 
-print(response.text)
-
+    print(response.text)
+except:
+    pass
 
 # middle part - print hello
 
