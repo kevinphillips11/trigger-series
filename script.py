@@ -4,7 +4,7 @@ import os
 
 # cancel the previous run
 
-url = f"https://api.github.com/repos/kevinphillips11/REPO/actions/runs/{os.environ['PREVIOUS_RUN_ID']}/cancel"
+url = f"https://api.github.com/repos/kevinphillips11/trigger-series/actions/runs/{os.environ['PREVIOUS_RUN_ID']}/cancel"
 
 payload = {}
 headers = {
