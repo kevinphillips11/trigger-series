@@ -9,4 +9,5 @@ jobs:
 
     steps:
       - name: Print Run ID
-        run: echo "Current Run ID: ${{ github.run_id }}"
+        run: |
+          echo "Current Run ID: ${{ github.run_id }}"
