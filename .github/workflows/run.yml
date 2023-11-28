@@ -12,11 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      app:
-        image: python:3.x
+      ngrok:
+        image: ghcr.io/kubesail/unprivileged-ngrok:latest
         ports:
-          - 5000:5000
-        command: bash -c "pip install -r requirements.txt && ngrok http --region=us --hostname=handy-labrador-humane.ngrok-free.app 5000 & sleep 5 && python script.py"
+          - 5000:5000  # Expose port 5000
 
     steps:
     - name: Checkout code
@@ -33,14 +32,20 @@ jobs:
 
     - name: Install ngrok
       run: |
-        curl -s https://ngrok-agent.s3.amazonaws.com/ngrok.asc | \
-          sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null && \
-          echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | \
-          sudo tee /etc/apt/sources.list.d/ngrok.list && \
-          sudo apt update && sudo apt install ngrok
+        sudo apt update && sudo apt install ngrok
 
     - name: Authenticate ngrok
-      run: ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
+      run: ngrok authtoken ${{ secrets.NGROK_TOKEN }}
 
-    - name: Waiting for ngrok and Flask to start
-      run: sleep 20  # Adjust this based on the time your Flask app and ngrok take to start
+    - name: Start ngrok
+      run: ngrok http 5000 &
+      env:
+        NGROK_PORT: 5000
+
+    - name: Run script.py
+      run: python script.py
+      env:
+        CURRENT_RUN_ID: ${{ github.run_id }}
+        PREVIOUS_RUN_ID: ${{ github.event.inputs.previous_run_id }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        NGROK_PORT: 5000
