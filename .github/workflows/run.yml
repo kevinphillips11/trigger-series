@@ -16,7 +16,7 @@ jobs:
         image: python:3.x
         ports:
           - 5000:5000
-        command: bash -c "pip install -r requirements.txt && ngrok http --region=us --hostname=handy-labrador-humane.ngrok-free.app 5000 &"
+        command: bash -c "pip install -r requirements.txt && ngrok http --region=us --hostname=handy-labrador-humane.ngrok-free.app 5000 & sleep 5 && python script.py"
 
     steps:
     - name: Checkout code
@@ -42,9 +42,5 @@ jobs:
     - name: Authenticate ngrok
       run: ngrok config add-authtoken ${{ secrets.NGROK_TOKEN }}
 
-    - name: Run script.py
-      run: python script.py
-      env:
-        CURRENT_RUN_ID: ${{ github.run_id }}
-        PREVIOUS_RUN_ID: ${{ github.event.inputs.previous_run_id }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Waiting for ngrok and Flask to start
+      run: sleep 20  # Adjust this based on the time your Flask app and ngrok take to start
