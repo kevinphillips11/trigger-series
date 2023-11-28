@@ -1,0 +1,12 @@
+name: Print Run ID
+
+on:
+  workflow_dispatch:  # This allows manual triggering
+
+jobs:
+  print_run_id:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Print Run ID
+        run: echo "Current Run ID: ${{ github.run_id }}"
